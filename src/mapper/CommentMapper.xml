@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.CommentMapper">
+	<resultMap type="Comment" id="queryMap">
+		<id property="id" column="id" />
+		<result property="userid" column="userid" />
+		<result property="content" column="content" />
+		<result property="cdate" column="cdate" />
+		<result property="state" column="state" />
+		<result property="blogid" column="blogid" />
+		<result property="uname" column="uname" />
+		<association property="bloggerVO" javaType="Blogger">
+			<id property="id" column="id" />
+			<result property="username" column="username" />
+			<result property="password" column="password" />
+			<result property="profile" column="profile" />
+			<result property="nickname" column="nickname" />
+			<result property="sign" column="sign" />
+			<result property="imagename" column="imagename" />
+		</association>
+	</resultMap>
+	<sql id="Where_Clause">
+		<where>
+			<if test="id!=null and id!=0">
+				and a.id= #{id}
+                </if>
+			<if test="userid!=null and userid!=0">
+				and a.userid= #{userid}
+                        </if>
+			<if test="state!=null and state!=0">
+				and a.state= #{state}
+                        </if>
+			<if test="blogid!=null and blogid!=0">
+				and a.blogid= #{blogid}
+                        </if>
+		</where>
+	</sql>
+	<select id="query" parameterType="java.util.Map" resultMap="queryMap">
+		select
+		a.*,b.username,b.password,b.profile,b.nickname,b.sign,b.imagename from
+		comment a left join blogger b on a.userid=b.id
+		<include refid="Where_Clause" />
+		<if test="page">
+			limit #{offset} ,#{pageSize}
+                </if>
+	</select>
+	<select id="getCount" parameterType="java.util.Map" resultType="Int">
+		select count(*) nums from comment a left join blogger b on
+		a.userid=b.id
+		<include refid="Where_Clause" />
+	</select>
+	<select id="queryCommentById" parameterType="int" resultType="Comment">
+		select * from comment where id=${value}
+	</select>
+	<insert id="insertComment" useGeneratedKeys="true" keyProperty="id"
+		parameterType="Comment">
+		insert into comment
+		(userid,content,cdate,state,blogid,uname)
+		values
+		(#{userid},#{content},#{cdate},#{state},#{blogid},#{uname});
+	</insert>
+	<update id="updateComment" parameterType="Comment">
+		update
+		comment set
+		userid=#{userid},content=#{content},cdate=#{cdate},state=#{state},blogid=#{blogid},uname=#{uname}
+		where
+		id=#{id}	
+	</update>
+	<delete id="deleteComment" parameterType="int">
+		delete from comment where id=${value}
+	</delete>
+</mapper>
+ 

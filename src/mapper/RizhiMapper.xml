@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.RizhiMapper">
+	<sql id="Where_Clause">
+		<where>
+			<if test="id!=null and id!=0">
+				and id= #{id}
+            </if>
+			<if test="uid!=null and uid!=0">
+				and uid= #{uid}
+                    </if>
+			<if test="cdate!=null and cdate!=''">
+				and cdate=#{cdate}
+                        </if>
+		</where>
+	</sql>
+	<select id="query" parameterType="java.util.Map" resultType="Rizhi">
+		select * from rizhi
+		<include refid="Where_Clause" />
+		<if test="page">
+			limit #{offset} ,#{pageSize}
+        </if>
+	</select>
+	<select id="getCount" parameterType="java.util.Map" resultType="Int">
+		select count(0) from rizhi
+		<include refid="Where_Clause" />
+	</select>
+	<select id="queryRizhiById" parameterType="int" resultType="Rizhi">
+		select * from rizhi where id=${value}
+	</select>
+	<insert id="insertRizhi" useGeneratedKeys="true" keyProperty="id"
+		parameterType="Rizhi">
+		insert into rizhi
+		(uid,cdate)
+		values
+		(#{uid},#{cdate});
+	</insert>
+	<update id="updateRizhi" parameterType="Rizhi">
+		update rizhi set
+		uid=#{uid},cdate=#{cdate}
+		where
+		id=#{id}	
+	</update>
+	<delete id="deleteRizhi" parameterType="int">
+		delete from rizhi where id=${value}
+	</delete>
+</mapper>
+ 

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.BlogMapper">
+	<resultMap type="Blog" id="queryMap">
+		<id property="id" column="id" />
+		<result property="uid" column="uid" />
+		<result property="title" column="title" />
+		<result property="summary" column="summary" />
+		<result property="cdate" column="cdate" />
+		<result property="clickhit" column="clickhit" />
+		<result property="replyhit" column="replyhit" />
+		<result property="likenum" column="likenum" />
+		<result property="content" column="content" />
+		<result property="keyword" column="keyWord" />
+		<result property="typeid" column="typeid" />
+		<result property="tagid" column="tagid" />
+		<result property="xq" column="xq" />
+		<association property="bloggerVO" javaType="Blogger">
+			<id property="id" column="id" />
+			<result property="username" column="username" />
+			<result property="password" column="password" />
+			<result property="profile" column="profile" />
+			<result property="nickname" column="nickname" />
+			<result property="sign" column="sign" />
+			<result property="imagename" column="imagename" />
+		</association>
+		<association property="blogtypeVO" javaType="Blogtype">
+			<id property="id" column="id" />
+			<result property="typename" column="typename" />
+		</association>
+		<association property="tagVO" javaType="Tag">
+			<id property="id" column="id" />
+			<result property="tagname" column="tagname" />
+		</association>
+	</resultMap>
+	<sql id="Where_Clause">
+		<where>
+			<if test="id!=null and id!=0">
+				and a.id= #{id}
+                </if>
+			<if test="uid!=null and uid!=0">
+				and a.uid= #{uid}
+                        </if>
+			<if test="title!=null and title!=''">
+				and a.title like "%"#{title}"%"
+                            </if>
+			<if test="keyword!=null and keyword!=''">
+				and a.keyWord=#{keyword}
+                            </if>
+			<if test="typeid!=null and typeid!=0">
+				and a.typeid= #{typeid}
+                        </if>
+            <if test="tagid!=null and tagid!=0">
+				and a.tagid= #{tagid}
+                        </if>
+		
+                        
+            <if test="fx!=null and nextid!=null">
+				<if test="fx==-1">
+				and a.id&lt;#{nextid}
+            	</if> 
+            	<if test="fx==1">
+				and a.id&gt;#{nextid}
+            	</if> 
+            </if>           
+                        
+		</where>
+	</sql>
+	<select id="query" parameterType="java.util.Map" resultMap="queryMap">
+		select
+		a.*,b.username,b.password,b.profile,b.nickname,b.sign,b.imagename,c.typename,
+		d.tagname
+		from blog a left join blogger b on a.uid=b.id left join blogtype c on
+		a.typeid=c.id left join tag d on a.tagid=d.id
+		<include refid="Where_Clause" />
+		<if test="page">
+			limit #{offset} ,#{pageSize}
+                </if>
+	</select>
+	<select id="getCount" parameterType="java.util.Map" resultType="Int">
+		select count(*) nums from blog a left join blogger b on a.uid=b.id
+		left join blogtype c on a.typeid=c.id left join tag d on a.tagid=d.id
+		<include refid="Where_Clause" />
+	</select>
+	<select id="queryBlogById" parameterType="int" resultType="Blog">
+		select * from blog where id=${value}
+	</select>
+	<insert id="insertBlog" useGeneratedKeys="true" keyProperty="id"
+		parameterType="Blog">
+		insert into blog
+		(uid,title,summary,cdate,clickhit,replyhit,likenum,content,keyWord,typeid,tagid,xq)
+		values
+		(#{uid},#{title},#{summary},#{cdate},#{clickhit},#{replyhit},#{likenum},#{content},#{keyword},#{typeid},#{tagid},#{xq});
+	</insert>
+	<update id="updateBlog" parameterType="Blog">
+		update blog set
+		title=#{title},summary=#{summary},clickhit=#{clickhit},replyhit=#{replyhit},likenum=#{likenum},content=#{content}
+		,keyWord=#{keyword},typeid=#{typeid},tagid=#{tagid}
+		where
+		id=#{id}	
+	</update>
+	<delete id="deleteBlog" parameterType="int">
+		delete from blog where id=${value}
+	</delete>
+</mapper>
+ 

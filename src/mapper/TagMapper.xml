@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.TagMapper">
+	<resultMap id="BlogTypeResult" type="Tag">
+        <id property="id" column="id" />
+        <result property="tagname" column="tagname"/>
+        <result property="blogCount" column="blogCount"/>
+    </resultMap>
+
+	<sql id="Where_Clause">
+		<where>
+			<if test="id!=null and id!=0">
+				and id= #{id}
+            </if>
+		</where>
+	</sql>
+	<select id="query" parameterType="java.util.Map" resultType="Tag">
+		select * from tag
+		<include refid="Where_Clause" />
+		<if test="page">
+			limit #{offset} ,#{pageSize}
+        </if>
+	</select>
+	<select id="getCount" parameterType="java.util.Map" resultType="Int">
+		select count(0) from tag
+		<include refid="Where_Clause" />
+	</select>
+	<select id="queryTagById" parameterType="int" resultType="Tag">
+		select * from tag where id=${value}
+	</select>
+	<insert id="insertTag" useGeneratedKeys="true" keyProperty="id"
+		parameterType="Tag">
+		insert into tag
+		(tagname)
+		values
+		(#{tagname});
+	</insert>
+	<update id="updateTag" parameterType="Tag">
+		update
+		tag set
+		tagname=#{tagname}
+		where
+		id=#{id}	
+	</update>
+	<delete id="deleteTag" parameterType="int">
+		delete from tag where id=${value}
+	</delete>
+	
+	
+	
+	  <select id="getBlogTypeData" parameterType="java.lang.Integer" resultMap="BlogTypeResult">
+        SELECT
+        t2.*,
+        COUNT(t1.id) AS blogCount
+        FROM
+        blog t1
+        RIGHT JOIN tag t2
+        ON t1.typeid = t2.id and t1.xq=1 
+         <if test="value!=null and value!=0">
+         and t1.uid = #{uid}
+        </if>
+        GROUP BY t2.typename
+        ORDER BY t2.id
+    </select>
+</mapper>
+ 

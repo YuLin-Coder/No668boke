@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.LikeMapper">
+	<sql id="Where_Clause">
+		<where>
+			<if test="id!=null and id!=0">
+				and id= #{id}
+            </if>
+			<if test="uid!=null and uid!=0">
+				and uid= #{uid}
+                    </if>
+			<if test="bkid!=null and bkid!=0">
+				and bkid= #{bkid}
+                    </if>
+		</where>
+	</sql>
+	<select id="query" parameterType="java.util.Map" resultType="Like">
+		select * from `like`
+		<include refid="Where_Clause" />
+		<if test="page">
+			limit #{offset} ,#{pageSize}
+        </if>
+	</select>
+	<select id="getCount" parameterType="java.util.Map" resultType="Int">
+		select count(0) from `like`
+		<include refid="Where_Clause" />
+	</select>
+	<select id="queryLikeById" parameterType="int" resultType="Like">
+		select * from `like` where id=${value}
+	</select>
+	<insert id="insertLike" useGeneratedKeys="true" keyProperty="id"
+		parameterType="Like">
+		insert into `like`
+		(uid,bkid,cdate)
+		values
+		(#{uid},#{bkid},#{cdate});
+	</insert>
+	<update id="updateLike" parameterType="Like">
+		update `like` set
+		uid=#{uid},bkid=#{bkid},cdate=#{cdate}
+		where
+		id=#{id}	
+	</update>
+	<delete id="deleteLike" parameterType="int">
+		delete from `like` where id=${value}
+	</delete>
+	
+	<delete id="delLike"  parameterType="java.util.Map">
+	    delete from  `like` where uid=#{uid}  and bkid=#{bkid}  
+	</delete>
+</mapper>
+ 

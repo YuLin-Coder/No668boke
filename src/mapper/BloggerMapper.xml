@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.BloggerMapper">
+	<sql id="Where_Clause">
+		<where>
+			<if test="id!=null and id!=0">
+				and id= #{id}
+            </if>
+			<if test="username!=null and username!=''">
+				and username=#{username}
+                        </if>
+			<if test="password!=null and password!=''">
+				and password=#{password}
+                        </if>
+            <if test="nickname!=null and nickname!=''">
+				and nickname like "%"#{nickname}"%"
+                        </if>
+		</where>
+	</sql>
+	<select id="query" parameterType="java.util.Map" resultType="Blogger">
+		select * from blogger
+		<include refid="Where_Clause" />
+		<if test="page">
+			limit #{offset} ,#{pageSize}
+        </if>
+	</select>
+	<select id="getCount" parameterType="java.util.Map" resultType="Int">
+		select count(0) from blogger
+		<include refid="Where_Clause" />
+	</select>
+	<select id="queryBloggerById" parameterType="int" resultType="Blogger">
+		select * from blogger where id=${value}
+	</select>
+	<insert id="insertBlogger" useGeneratedKeys="true" keyProperty="id"
+		parameterType="Blogger">
+		insert into blogger
+		(username,password,profile,nickname,sign,imagename)
+		values
+		(#{username},#{password},#{profile},#{nickname},#{sign},#{imagename});
+	</insert>
+	<update id="updateBlogger" parameterType="Blogger">
+		update
+		blogger set
+		username=#{username},password=#{password},profile=#{profile},nickname=#{nickname},sign=#{sign},imagename=#{imagename}
+		where
+		id=#{id}	
+	</update>
+	<delete id="deleteBlogger" parameterType="int">
+		delete from blogger where id=${value}
+	</delete>
+</mapper>
+ 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.BlogtypeMapper">
+	<resultMap id="BlogTypeResult" type="Blogtype">
+        <id property="id" column="id" />
+        <result property="typename" column="typename"/>
+        <result property="blogCount" column="blogCount"/>
+    </resultMap>
+
+	<sql id="Where_Clause">
+		<where>
+			<if test="id!=null and id!=0">
+				and id= #{id}
+            </if>
+		</where>
+	</sql>
+	<select id="query" parameterType="java.util.Map" resultType="Blogtype">
+		select * from blogtype
+		<include refid="Where_Clause" />
+		<if test="page">
+			limit #{offset} ,#{pageSize}
+        </if>
+	</select>
+	<select id="getCount" parameterType="java.util.Map" resultType="Int">
+		select count(0) from blogtype
+		<include refid="Where_Clause" />
+	</select>
+	<select id="queryBlogtypeById" parameterType="int" resultType="Blogtype">
+		select * from blogtype where id=${value}
+	</select>
+	<insert id="insertBlogtype" useGeneratedKeys="true" keyProperty="id"
+		parameterType="Blogtype">
+		insert into blogtype
+		(typename)
+		values
+		(#{typename});
+	</insert>
+	<update id="updateBlogtype" parameterType="Blogtype">
+		update
+		blogtype set
+		typename=#{typename}
+		where
+		id=#{id}	
+	</update>
+	<delete id="deleteBlogtype" parameterType="int">
+		delete from blogtype where id=${value}
+	</delete>
+	
+	
+	
+	  <select id="getBlogTypeData" parameterType="java.lang.Integer" resultMap="BlogTypeResult">
+        SELECT
+        t2.*,
+        COUNT(t1.id) AS blogCount
+        FROM
+        blog t1
+        RIGHT JOIN blogtype t2
+        ON t1.typeid = t2.id and t1.xq=1 
+         <if test="value!=null and value!=0">
+         and t1.uid = #{uid}
+        </if>
+        GROUP BY t2.id
+        ORDER BY t2.id
+    </select>
+</mapper>
+ 
